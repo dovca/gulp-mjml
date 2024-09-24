@@ -12,13 +12,13 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "mjml": "^4.0.0",
+    "mjml": "^5.0.0-alpha.4",
     "plugin-error": "^1.0.1",
     "replace-ext": "^1.0.0",
     "through2": "^3.0.1"
   },
   "devDependencies": {
-    "gulp": "^4.0.0"
+    "gulp": "^5.0.0"
   },
   "repository": {
     "type": "git",

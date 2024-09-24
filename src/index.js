@@ -20,6 +20,8 @@ module.exports = function mjml(mjmlEngine, options) {
   }
 
   return through.obj(function(file, enc, callback) {
+    const that = this;
+
     // Not a big fan of this deep copy methods
     // But it will work regardless of Node version
     const localOptions = JSON.parse(JSON.stringify(options));
@@ -36,19 +38,19 @@ module.exports = function mjml(mjmlEngine, options) {
 
     if (file.isBuffer()) {
       const output = file.clone();
-      let render;
 
-      try {
-        render = mjmlEngine(file.contents.toString(), localOptions);
-      } catch (e) {
-        this.emit("error", raise(e.message));
-        return callback();
-      }
-
-      // [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues
-      output.contents = Buffer.from(render.html);
-      output.path = replaceExt(file.path.toString(), localOptions.fileExt || ".html");
-      this.push(output);
+      return mjmlEngine(file.contents.toString(), localOptions)
+        .then(function (render) {
+          // [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues
+          output.contents = Buffer.from(render.html);
+          output.path = replaceExt(file.path.toString(), localOptions.fileExt || ".html");
+          that.push(output);
+        })
+        .catch(function (error) {
+          that.emit("error", raise(error));
+          return callback();
+        })
+        .then(callback);
     }
     return callback();
   });
